@@ -6,24 +6,31 @@
   <title>Relay — Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
-      --dark:        #080810;
-      --surface:     #0f0f1a;
-      --card:        #13131f;
-      --border:      rgba(255,255,255,.07);
-      --text:        #e8e8f0;
-      --muted:       #8888a0;
-      --lime:        #a3e635;
-      --lime-pale:   rgba(163,230,53,.12);
-      --lime-border: rgba(163,230,53,.25);
-      --r:           12px;
+      --page:          #ffffff;
+      --surface:       #f8f7ff;
+      --card:          #ffffff;
+      --border:        #e5e3f0;
+      --border-dark:   #d1cee8;
+      --text:          #1a1730;
+      --muted:         #6b6885;
+      --subtle:        #9896b0;
+      --violet:        #7c3aed;
+      --violet-light:  #ede9fe;
+      --violet-border: #c4b5fd;
+      --teal:          #0d9488;
+      --teal-light:    #ccfbf1;
+      --red:           #dc2626;
+      --red-light:     #fee2e2;
+      --red-border:    #fca5a5;
+      --r:             14px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--dark);
+      background: var(--surface);
       color: var(--text);
       font-family: 'Inter', system-ui, sans-serif;
       min-height: 100vh;
@@ -38,24 +45,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 32px;
+      gap: 28px;
     }
     .logo {
       display: flex;
       align-items: center;
       gap: 10px;
+      text-decoration: none;
     }
     .logo-mark {
-      width: 36px;
-      height: 36px;
-      background: var(--lime-pale);
-      border: 1px solid var(--lime-border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 40px; height: 40px;
+      background: var(--violet-light);
+      border: 1.5px solid var(--violet-border);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
     }
-    .logo-mark svg { width: 20px; height: 20px; }
+    .logo-mark svg { width: 22px; height: 22px; }
     .logo-name {
       font-size: 22px;
       font-weight: 700;
@@ -65,33 +70,37 @@
     .login-card {
       width: 100%;
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 36px 32px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
       display: flex;
       flex-direction: column;
       gap: 24px;
+      box-shadow: 0 4px 24px rgba(124,58,237,.08);
     }
     .login-header { text-align: center; }
     .login-header h1 {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 22px;
+      font-weight: 700;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
     }
     .login-header p {
       font-size: 14px;
       color: var(--muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .divider {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: var(--muted);
+      color: var(--subtle);
       font-size: 12px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      font-family: 'JetBrains Mono', monospace;
     }
     .divider::before, .divider::after {
       content: '';
@@ -105,6 +114,7 @@
     }
     .status-msg {
       font-size: 13px;
+      font-weight: 500;
       text-align: center;
       padding: 10px 14px;
       border-radius: 8px;
@@ -112,39 +122,39 @@
     }
     .status-msg.error {
       display: block;
-      background: rgba(248,113,113,.12);
-      border: 1px solid rgba(248,113,113,.25);
-      color: #f87171;
+      background: var(--red-light);
+      border: 1px solid var(--red-border);
+      color: var(--red);
     }
     .status-msg.info {
       display: block;
-      background: var(--lime-pale);
-      border: 1px solid var(--lime-border);
-      color: var(--lime);
+      background: var(--violet-light);
+      border: 1px solid var(--violet-border);
+      color: var(--violet);
     }
     .footer-note {
       font-size: 12px;
       color: var(--muted);
       text-align: center;
-      line-height: 1.6;
+      line-height: 1.7;
     }
-    .footer-note a { color: var(--lime); text-decoration: none; }
+    .footer-note a { color: var(--violet); text-decoration: none; }
     .footer-note a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <div class="login-wrap">
-    <div class="logo">
+    <a href="../" class="logo">
       <div class="logo-mark">
-        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="4" cy="10" r="2.5" fill="#a3e635"/>
-          <circle cx="16" cy="10" r="2.5" fill="#a3e635" opacity="0.5"/>
-          <line x1="6.5" y1="10" x2="13.5" y2="10" stroke="#a3e635" stroke-width="1.5"/>
-          <circle cx="10" cy="10" r="1.5" fill="#a3e635" opacity="0.8"/>
+        <svg viewBox="0 0 20 20" fill="none">
+          <circle cx="4"  cy="10" r="2.5" fill="#7c3aed"/>
+          <circle cx="16" cy="10" r="2.5" fill="#7c3aed" opacity="0.4"/>
+          <line x1="6.5" y1="10" x2="13.5" y2="10" stroke="#7c3aed" stroke-width="1.5"/>
+          <circle cx="10" cy="10" r="1.5" fill="#7c3aed" opacity="0.75"/>
         </svg>
       </div>
       <span class="logo-name">Relay</span>
-    </div>
+    </a>
 
     <div class="login-card">
       <div class="login-header">
@@ -187,16 +197,14 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || 'Authentication failed');
-
         localStorage.setItem('relay_token', data.token);
-        localStorage.setItem('relay_user',  JSON.stringify(data.user));
+        localStorage.setItem('relay_user', JSON.stringify(data.user));
         window.location.href = window.location.pathname.includes('/relay/') ? '/relay/app/' : '/app/';
       } catch (err) {
         showStatus(err.message || 'Sign-in failed — please try again.');
       }
     }
 
-    // Redirect if already logged in
     if (localStorage.getItem('relay_token')) {
       window.location.href = window.location.pathname.includes('/relay/') ? '/relay/app/' : '/app/';
     }
@@ -209,13 +217,7 @@
       });
       google.accounts.id.renderButton(
         document.getElementById('google-btn-container'),
-        {
-          theme: 'filled_black',
-          size: 'large',
-          width: 320,
-          text: 'continue_with',
-          shape: 'rectangular',
-        }
+        { theme: 'outline', size: 'large', width: 320, text: 'continue_with', shape: 'rectangular' }
       );
     };
   </script>

@@ -6,1099 +6,880 @@
   <title>Relay — Publisher Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ── Design tokens (SwarmHawk design system) ── */
     :root {
-      --dark:        #080810;
-      --surface:     #0f0f1a;
-      --card:        #13131f;
-      --border:      rgba(255,255,255,.07);
-      --text:        #e8e8f0;
-      --muted:       #8888a0;
-      --lime:        #a3e635;
-      --lime-pale:   rgba(163,230,53,.12);
-      --lime-border: rgba(163,230,53,.25);
-      --red:         #f87171;
-      --amber:       #fbbf24;
-      --blue:        #60a5fa;
-      --purple:      #a78bfa;
-      --r:           12px;
-      --nav-h:       60px;
+      --page:          #ffffff;
+      --surface:       #f8f7ff;
+      --card:          #ffffff;
+      --border:        #e5e3f0;
+      --border-dark:   #d1cee8;
+      --text:          #1a1730;
+      --muted:         #6b6885;
+      --subtle:        #9896b0;
+      --violet:        #7c3aed;
+      --violet-light:  #ede9fe;
+      --violet-border: #c4b5fd;
+      --violet-hover:  #6d28d9;
+      --teal:          #0d9488;
+      --teal-light:    #ccfbf1;
+      --teal-border:   #5eead4;
+      --red:           #dc2626;
+      --red-light:     #fee2e2;
+      --red-border:    #fca5a5;
+      --amber:         #d97706;
+      --amber-light:   #fef3c7;
+      --amber-border:  #fcd34d;
+      --blue:          #2563eb;
+      --blue-light:    #dbeafe;
+      --blue-border:   #93c5fd;
+      --r:             14px;
+      --nav-h:         60px;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background: var(--dark);
+      background: var(--surface);
       color: var(--text);
       font-family: 'Inter', system-ui, sans-serif;
-      font-size: 14px;
-      min-height: 100vh;
+      font-size: 14px; min-height: 100vh;
     }
 
     /* ── Nav ── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      position: fixed; top: 0; left: 0; right: 0;
       height: var(--nav-h);
-      background: rgba(8,8,16,.85);
+      background: rgba(255,255,255,.92);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      z-index: 100;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 300;
     }
-    .nav-left { display: flex; align-items: center; gap: 28px; }
+    .nav-left { display: flex; align-items: center; gap: 24px; }
     .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .logo-mark {
       width: 28px; height: 28px;
-      background: var(--lime-pale);
-      border: 1px solid var(--lime-border);
-      border-radius: 6px;
+      background: var(--violet-light);
+      border: 1.5px solid var(--violet-border);
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
     }
     .logo-mark svg { width: 16px; height: 16px; }
-    .logo-name { font-size: 16px; font-weight: 700; color: var(--text); }
-
+    .logo-name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
     .nav-tabs { display: flex; gap: 2px; }
     .nav-tab {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      cursor: pointer;
-      border: none;
-      background: none;
+      padding: 6px 14px; border-radius: 6px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted); cursor: pointer;
+      border: none; background: none;
       transition: color .15s, background .15s;
     }
-    .nav-tab:hover { color: var(--text); background: rgba(255,255,255,.05); }
-    .nav-tab.active { color: var(--lime); background: var(--lime-pale); }
-
-    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-tab:hover { color: var(--text); background: var(--surface); }
+    .nav-tab.active { color: var(--violet); background: var(--violet-light); font-weight: 600; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
     .plan-badge {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      background: var(--lime-pale);
-      color: var(--lime);
-      border: 1px solid var(--lime-border);
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      background: var(--surface); color: var(--muted);
+      border: 1px solid var(--border);
       font-family: 'JetBrains Mono', monospace;
     }
-    .plan-badge.growth { background: rgba(96,165,250,.12); color: var(--blue); border-color: rgba(96,165,250,.25); }
-    .plan-badge.scale  { background: rgba(167,139,250,.12); color: var(--purple); border-color: rgba(167,139,250,.25); }
-    .btn-sm {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      transition: border-color .15s, color .15s;
+    .plan-badge.growth { background: var(--blue-light); color: #1d4ed8; border-color: var(--blue-border); }
+    .plan-badge.scale  { background: var(--violet-light); color: #5b21b6; border-color: var(--violet-border); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 7px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid var(--border-dark);
+      background: var(--page); color: var(--text);
+      transition: all .15s; font-family: 'Inter', sans-serif;
     }
-    .btn-sm:hover { border-color: var(--lime-border); color: var(--lime); }
-    .btn-lime {
-      background: var(--lime);
-      color: #080810;
-      border-color: transparent;
-      font-weight: 600;
-    }
-    .btn-lime:hover { background: #b5f23d; color: #080810; }
+    .btn:hover { border-color: var(--violet-border); color: var(--violet); }
+    .btn-primary { background: var(--violet); color: #fff; border-color: var(--violet); }
+    .btn-primary:hover { background: var(--violet-hover); border-color: var(--violet-hover); color: #fff; }
+    .btn-danger { background: var(--red-light); color: var(--red); border-color: var(--red-border); }
+    .btn-danger:hover { background: #fecaca; }
     .avatar {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      cursor: pointer;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--violet-light); border: 1.5px solid var(--violet-border);
+      overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--violet);
     }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* ── Main layout ── */
+    /* ── Main ── */
     main {
-      padding-top: calc(var(--nav-h) + 32px);
-      max-width: 1280px;
-      margin: 0 auto;
-      padding-left: 24px;
-      padding-right: 24px;
-      padding-bottom: 48px;
+      padding-top: calc(var(--nav-h) + 28px);
+      max-width: 1280px; margin: 0 auto;
+      padding-left: 24px; padding-right: 24px; padding-bottom: 48px;
     }
-
-    /* ── Tabs content ── */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
     /* ── Section header ── */
     .section-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      gap: 16px;
+      display: flex; align-items: flex-end;
+      justify-content: space-between; margin-bottom: 20px; gap: 16px;
     }
-    .section-header h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .section-header p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
+    .section-header h2 { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .section-header p { font-size: 13px; color: var(--muted); margin-top: 3px; }
 
     /* ── Stats grid ── */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 14px; margin-bottom: 20px;
     }
-    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
-
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
     .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 20px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 20px;
+      box-shadow: 0 1px 4px rgba(28,24,60,.06);
     }
     .stat-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
     }
     .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text);
+      font-size: 30px; font-weight: 700; color: var(--text);
       font-family: 'JetBrains Mono', monospace;
-      line-height: 1;
+      line-height: 1; font-variant-numeric: tabular-nums;
     }
-    .stat-value.lime  { color: var(--lime); }
-    .stat-value.blue  { color: var(--blue); }
-    .stat-value.amber { color: var(--amber); }
+    .stat-value.violet { color: var(--violet); }
+    .stat-value.teal   { color: var(--teal); }
+    .stat-value.amber  { color: var(--amber); }
+    .stat-value.blue   { color: var(--blue); }
     .stat-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 6px;
-      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--muted); margin-top: 6px;
     }
 
     /* ── Cards ── */
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 24px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px;
+      box-shadow: 0 1px 4px rgba(28,24,60,.06);
     }
     .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 16px;
+      font-size: 13px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 16px;
     }
-
-    /* ── Two-column layout ── */
     .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-top: 14px;
     }
     @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
     /* ── Table ── */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .data-table th {
-      text-align: left;
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
+      text-align: left; padding: 8px 12px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+      background: var(--surface);
     }
-    .data-table td {
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
+    .data-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text); }
     .data-table tr:last-child td { border-bottom: none; }
-    .data-table tbody tr:hover { background: rgba(255,255,255,.02); }
-    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .data-table tbody tr:hover { background: var(--surface); }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
 
-    /* ── Agent tier badges ── */
+    /* ── Tier badges ── */
     .tier-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .05em;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .05em; text-transform: uppercase;
       font-family: 'JetBrains Mono', monospace;
     }
-    .tier-training  { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
-    .tier-inference { background: rgba(96,165,250,.12);  color: var(--blue);   border: 1px solid rgba(96,165,250,.25); }
-    .tier-search    { background: rgba(251,191,36,.12);  color: var(--amber);  border: 1px solid rgba(251,191,36,.25); }
-    .tier-unknown   { background: rgba(255,255,255,.07); color: var(--muted);  border: 1px solid var(--border); }
+    .tier-training  { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+    .tier-inference { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .tier-search    { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+    .tier-unknown   { background: #f3f2f8; color: #6b6885; border: 1px solid #e5e3f0; }
+    .tier-blocked   { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-    /* ── Chart container ── */
+    /* ── Chart ── */
     .chart-wrap { position: relative; height: 200px; }
 
-    /* ── Worker setup card ── */
+    /* ── Setup steps ── */
     .setup-step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 16px 0; border-bottom: 1px solid var(--border);
     }
     .setup-step:last-child { border-bottom: none; padding-bottom: 0; }
     .step-num {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--lime-pale);
-      border: 1px solid var(--lime-border);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--violet-light); border: 1.5px solid var(--violet-border);
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700;
-      color: var(--lime);
-      flex-shrink: 0;
-      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; font-weight: 700; color: var(--violet);
+      flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
     }
-    .step-num.done { background: var(--lime); color: #080810; }
+    .step-num.done { background: var(--violet); color: #fff; border-color: var(--violet); }
     .step-body { flex: 1; }
     .step-title { font-weight: 600; color: var(--text); margin-bottom: 4px; }
-    .step-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .step-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
     .code-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin-top: 10px;
+      background: #1e1b2e; border: 1px solid #352f4a; border-radius: 8px;
+      padding: 12px 14px; margin-top: 10px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--lime);
-      white-space: pre-wrap;
-      word-break: break-all;
-      cursor: pointer;
-      position: relative;
+      font-size: 12px; color: #a78bfa;
+      white-space: pre; overflow-x: auto; position: relative;
     }
-    .code-block::after {
-      content: 'COPY';
-      position: absolute;
-      top: 8px; right: 10px;
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: .08em;
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+      color: #9896b0; border-radius: 5px;
+      padding: 3px 8px; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif;
     }
-    .code-block:hover::after { color: var(--lime); }
+    .copy-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .api-key-box {
+      background: #1e1b2e; border: 1px solid #352f4a; border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: #a78bfa;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .api-key-val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ── Settings form ── */
-    .form-group { margin-bottom: 20px; }
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 10px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color .15s;
-    }
-    .form-input:focus { border-color: var(--lime-border); }
-    .form-input::placeholder { color: var(--muted); }
-    select.form-input { cursor: pointer; }
-
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .toggle-row:last-of-type { border-bottom: none; }
-    .toggle-info .toggle-title { font-weight: 500; color: var(--text); }
-    .toggle-info .toggle-desc  { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .toggle {
-      position: relative; width: 40px; height: 22px;
-      flex-shrink: 0;
-    }
+    /* ── Toggle ── */
+    .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; }
     .toggle-slider {
       position: absolute; inset: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      cursor: pointer;
-      transition: background .2s, border-color .2s;
+      background: #e5e3f0; border: 1.5px solid var(--border-dark);
+      border-radius: 22px; cursor: pointer; transition: all .2s;
     }
     .toggle-slider::before {
-      content: '';
-      position: absolute;
-      width: 16px; height: 16px;
-      left: 2px; top: 2px;
-      background: var(--muted);
-      border-radius: 50%;
-      transition: transform .2s, background .2s;
+      content: ''; position: absolute;
+      width: 16px; height: 16px; left: 2px; top: 1px;
+      background: #fff; border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: all .2s;
     }
-    .toggle input:checked + .toggle-slider { background: var(--lime-pale); border-color: var(--lime-border); }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); background: var(--lime); }
+    .toggle input:checked + .toggle-slider { background: var(--violet); border-color: var(--violet-hover); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-    /* ── Upgrade banner ── */
-    .upgrade-banner {
-      background: var(--lime-pale);
-      border: 1px solid var(--lime-border);
-      border-radius: var(--r);
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .upgrade-banner h3 { font-size: 15px; font-weight: 600; color: var(--lime); }
-    .upgrade-banner p  { font-size: 13px; color: var(--muted); margin-top: 3px; }
-    @media (max-width: 600px) { .upgrade-banner { flex-direction: column; align-items: flex-start; } }
-
-    /* ── Loading / empty states ── */
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--muted);
-    }
-    .empty-state h3 { font-size: 15px; color: var(--text); margin-bottom: 6px; }
+    /* ── Spinner ── */
     .spinner {
-      width: 20px; height: 20px;
+      display: inline-block; width: 20px; height: 20px;
       border: 2px solid var(--border);
-      border-top-color: var(--lime);
+      border-top-color: var(--violet);
       border-radius: 50%;
       animation: spin .8s linear infinite;
-      display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── API key display ── */
-    .api-key-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 10px 18px; border-radius: 10px;
+      font-size: 13px; font-weight: 600;
+      z-index: 9999; display: none;
+      box-shadow: 0 4px 16px rgba(28,24,60,.12);
     }
-    .api-key-box {
-      flex: 1;
-      padding: 10px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--lime);
-    }
+    #toast.success { background: var(--teal-light); color: #0f766e; border: 1px solid var(--teal-border); }
+    #toast.error   { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+    #toast.info    { background: var(--violet-light); color: var(--violet); border: 1px solid var(--violet-border); }
 
-    /* ── Onboarding overlay ── */
-    #onboarding-overlay {
-      display: none;
+    /* ── Onboarding modal ── */
+    .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(8,8,16,.9);
-      backdrop-filter: blur(8px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      background: rgba(26,23,48,.45);
+      backdrop-filter: blur(6px);
+      z-index: 500; display: flex;
+      align-items: center; justify-content: center;
     }
-    #onboarding-overlay.show { display: flex; }
-    .onboarding-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px;
-      max-width: 520px;
-      width: 100%;
+    .modal-box {
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 20px; padding: 40px;
+      max-width: 520px; width: 90%;
+      box-shadow: 0 20px 60px rgba(26,23,48,.12);
     }
-    .onboarding-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-    .onboarding-card p  { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
-    .btn-full {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: var(--lime);
-      color: #080810;
-      transition: background .15s;
+    .modal-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .modal-box p { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 24px; }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
     }
-    .btn-full:hover { background: #b5f23d; }
-    .btn-full:disabled { opacity: .5; cursor: not-allowed; }
+    .form-input {
+      width: 100%; padding: 10px 14px;
+      background: var(--page); color: var(--text);
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: inherit;
+      transition: border-color .15s, box-shadow .15s; outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-light);
+    }
+    .form-input::placeholder { color: var(--subtle); }
+    select.form-input { cursor: pointer; }
+    .form-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .form-row:last-child { border-bottom: none; }
+    .form-row-label h4 { font-size: 14px; font-weight: 600; color: var(--text); }
+    .form-row-label p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+    .empty-state p { margin-top: 8px; font-size: 13px; }
+
+    /* ── Live dot ── */
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal);
+      animation: pulse 2s ease-in-out infinite; display: inline-block;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
   </style>
 </head>
 <body>
 
-<!-- ── Navigation ──────────────────────────────────────────────────────────── -->
-<nav>
-  <div class="nav-left">
-    <a class="logo" href="/app/">
-      <div class="logo-mark">
-        <svg viewBox="0 0 20 20" fill="none">
-          <circle cx="4"  cy="10" r="2.5" fill="#a3e635"/>
-          <circle cx="16" cy="10" r="2.5" fill="#a3e635" opacity="0.5"/>
-          <line x1="6.5" y1="10" x2="13.5" y2="10" stroke="#a3e635" stroke-width="1.5"/>
-          <circle cx="10" cy="10" r="1.5" fill="#a3e635" opacity="0.8"/>
-        </svg>
-      </div>
-      <span class="logo-name">Relay</span>
-    </a>
-    <div class="nav-tabs">
-      <button class="nav-tab active" data-tab="overview">Overview</button>
-      <button class="nav-tab" data-tab="agents">Agents</button>
-      <button class="nav-tab" data-tab="content">Content</button>
-      <button class="nav-tab" data-tab="setup">Setup</button>
-      <button class="nav-tab" data-tab="settings">Settings</button>
-    </div>
-  </div>
-  <div class="nav-right">
-    <span id="plan-badge" class="plan-badge">Free</span>
-    <button class="btn-sm btn-lime" id="upgrade-btn" onclick="showUpgradeModal()">Upgrade</button>
-    <div class="avatar" id="avatar-wrap">
-      <img id="avatar-img" src="" alt="" />
-    </div>
-  </div>
-</nav>
-
-<!-- ── Onboarding overlay ──────────────────────────────────────────────────── -->
-<div id="onboarding-overlay">
-  <div class="onboarding-card">
-    <h2>Welcome to Relay</h2>
-    <p>Let's create your publisher account. We need your site name and domain to generate your Cloudflare Worker configuration.</p>
-    <div class="form-group">
-      <label class="form-label">Publisher Name</label>
-      <input type="text" class="form-input" id="ob-name" placeholder="e.g. The Daily Brief" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Your Domain</label>
-      <input type="text" class="form-input" id="ob-domain" placeholder="e.g. thedailybrief.com" />
-    </div>
-    <button class="btn-full" id="ob-submit" onclick="submitOnboarding()">Create Publisher Account →</button>
-    <div id="ob-error" style="margin-top:12px;font-size:13px;color:var(--red);display:none;"></div>
-  </div>
-</div>
-
-<!-- ── Main ────────────────────────────────────────────────────────────────── -->
-<main>
-
-  <!-- ── Overview tab ── -->
-  <div class="tab-content active" id="tab-overview">
-    <div class="section-header">
-      <div>
-        <h2>Overview</h2>
-        <p id="overview-subtitle">AI agent traffic for your site — last 30 days</p>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <select class="form-input" id="days-select" style="width:140px;padding:6px 10px;" onchange="loadOverview()">
-          <option value="7">Last 7 days</option>
-          <option value="30" selected>Last 30 days</option>
-          <option value="90">Last 90 days</option>
-        </select>
-        <button class="btn-sm" onclick="loadOverview()">Refresh</button>
-      </div>
-    </div>
-
-    <div id="upgrade-banner" class="upgrade-banner" style="display:none;">
-      <div>
-        <h3>You're on the free tier</h3>
-        <p>Upgrade to Growth for full analytics, license enforcement, and up to 5M agent requests/month.</p>
-      </div>
-      <button class="btn-sm btn-lime" onclick="showUpgradeModal()">Upgrade — $299/mo</button>
-    </div>
-
-    <div class="stats-grid" id="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Agent Requests</div>
-        <div class="stat-value" id="stat-requests"><span class="spinner"></span></div>
-        <div class="stat-sub" id="stat-requests-sub">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Bandwidth Saved</div>
-        <div class="stat-value lime" id="stat-saved"><span class="spinner"></span></div>
-        <div class="stat-sub" id="stat-saved-sub">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Cost Saved</div>
-        <div class="stat-value lime" id="stat-cost"><span class="spinner"></span></div>
-        <div class="stat-sub">at $0.09/GB egress</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">SOM Rate</div>
-        <div class="stat-value blue" id="stat-som-rate"><span class="spinner"></span></div>
-        <div class="stat-sub" id="stat-unique-pages">— unique pages crawled</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Daily Agent Requests</div>
-      <div class="chart-wrap">
-        <canvas id="timeseries-chart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Agents tab ── -->
-  <div class="tab-content" id="tab-agents">
-    <div class="section-header">
-      <div>
-        <h2>Agents</h2>
-        <p>Which AI systems are crawling your site and why</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Agent Breakdown</div>
-      <div id="agents-loading" style="text-align:center;padding:32px;color:var(--muted);"><span class="spinner"></span></div>
-      <table class="data-table" id="agents-table" style="display:none;">
-        <thead>
-          <tr>
-            <th>Agent</th>
-            <th>Tier</th>
-            <th>Requests</th>
-            <th>Bandwidth Saved</th>
-            <th>Share</th>
-          </tr>
-        </thead>
-        <tbody id="agents-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── Content tab ── -->
-  <div class="tab-content" id="tab-content">
-    <div class="section-header">
-      <div>
-        <h2>Content</h2>
-        <p>Your most AI-crawled pages — this is what agents find valuable</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Top Crawled Pages</div>
-      <div id="content-loading" style="text-align:center;padding:32px;color:var(--muted);"><span class="spinner"></span></div>
-      <table class="data-table" id="content-table" style="display:none;">
-        <thead>
-          <tr>
-            <th>Page</th>
-            <th>Requests</th>
-            <th>Unique Agents</th>
-            <th>Bandwidth Saved</th>
-          </tr>
-        </thead>
-        <tbody id="content-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── Setup tab ── -->
-  <div class="tab-content" id="tab-setup">
-    <div class="section-header">
-      <div>
-        <h2>Setup</h2>
-        <p>Deploy your Relay Worker to Cloudflare in under 10 minutes</p>
-      </div>
-    </div>
-
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">Your API Key</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">This key authenticates your Cloudflare Worker with Relay. Keep it secret.</p>
-        <div class="api-key-row">
-          <div class="api-key-box mono" id="api-key-display">rly_••••••••••••••••</div>
-          <button class="btn-sm" id="toggle-key-btn" onclick="toggleApiKey()">Show</button>
-          <button class="btn-sm" onclick="copyApiKey()">Copy</button>
+  <!-- ── Nav ── -->
+  <nav>
+    <div class="nav-left">
+      <a href="../" class="logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 20 20" fill="none">
+            <circle cx="4"  cy="10" r="2.5" fill="#7c3aed"/>
+            <circle cx="16" cy="10" r="2.5" fill="#7c3aed" opacity="0.4"/>
+            <line x1="6.5" y1="10" x2="13.5" y2="10" stroke="#7c3aed" stroke-width="1.5"/>
+            <circle cx="10" cy="10" r="1.5" fill="#7c3aed" opacity="0.75"/>
+          </svg>
         </div>
-        <button class="btn-sm" style="margin-top:12px;color:var(--red);border-color:rgba(248,113,113,.25);" onclick="rotateKey()">Rotate Key</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Quick Install</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Run these commands in your terminal (requires Node.js 18+):</p>
-        <div class="code-block" onclick="copyCode(this)">npx relay-init@latest</div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;">Requires Node.js 18+ and a Cloudflare account. Or <a href="https://github.com/hastikdan/relay-worker" target="_blank" style="color:var(--blue)">view manual setup →</a></p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">Manual Setup Steps</div>
-      <div class="setup-step">
-        <div class="step-num done">1</div>
-        <div class="step-body">
-          <div class="step-title">Create Relay account</div>
-          <div class="step-desc">Done — you're logged in and your publisher account is active.</div>
-        </div>
-      </div>
-      <div class="setup-step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Install the Cloudflare Worker</div>
-          <div class="step-desc">Clone the worker, add your API key as a secret, and deploy to your Cloudflare account.</div>
-          <div class="code-block" onclick="copyCode(this)">git clone https://github.com/hastikdan/relay-worker
-cd relay-worker
-npm install
-wrangler secret put RELAY_API_KEY
-wrangler deploy</div>
-        </div>
-      </div>
-      <div class="setup-step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Point your domain through Cloudflare</div>
-          <div class="step-desc">In your Cloudflare dashboard, add a Worker route for your domain. The Worker will intercept agent traffic automatically — human traffic passes through unchanged.</div>
-          <div class="code-block" onclick="copyCode(this)">Route: yourdomain.com/*
-Worker: relay-worker</div>
-        </div>
-      </div>
-      <div class="setup-step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">Verify agent traffic is flowing</div>
-          <div class="step-desc">Come back to the Overview tab after 24 hours. You should see your first agent requests appear in the dashboard. Most sites see traffic within hours.</div>
-        </div>
+        <span class="logo-name">Relay</span>
+      </a>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="overview">Overview</button>
+        <button class="nav-tab" data-tab="agents">Agents</button>
+        <button class="nav-tab" data-tab="content">Content</button>
+        <button class="nav-tab" data-tab="setup">Setup</button>
+        <button class="nav-tab" data-tab="settings">Settings</button>
       </div>
     </div>
-  </div>
-
-  <!-- ── Settings tab ── -->
-  <div class="tab-content" id="tab-settings">
-    <div class="section-header">
-      <div>
-        <h2>Settings</h2>
-        <p>Configure how Relay handles AI agent traffic for your site</p>
-      </div>
+    <div class="nav-right">
+      <span class="plan-badge" id="plan-badge">free</span>
+      <div class="avatar" id="user-avatar" title="Sign out">?</div>
     </div>
+  </nav>
 
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">Publisher Profile</div>
-        <div class="form-group">
-          <label class="form-label">Publisher Name</label>
-          <input type="text" class="form-input" id="settings-name" placeholder="Your publication name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Domain</label>
-          <input type="text" class="form-input" id="settings-domain" placeholder="yourdomain.com" />
-        </div>
-        <button class="btn-sm btn-lime" onclick="saveProfile()">Save Profile</button>
-      </div>
+  <main>
 
-      <div class="card">
-        <div class="card-title">License Policy</div>
-        <div class="form-group">
-          <label class="form-label">How should AI agents access your content?</label>
-          <select class="form-input" id="settings-policy">
-            <option value="free">Free — no restrictions</option>
-            <option value="attribution-required">Attribution Required</option>
-            <option value="contact">Contact for Licensing</option>
-            <option value="blocked">Block All AI Agents</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">License URL (optional)</label>
-          <input type="url" class="form-input" id="settings-license-url" placeholder="https://yourdomain.com/ai-license" />
-        </div>
-        <button class="btn-sm btn-lime" onclick="savePolicy()">Save Policy</button>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">Worker Behaviour</div>
-      <div class="toggle-row">
-        <div class="toggle-info">
-          <div class="toggle-title">SOM Serving</div>
-          <div class="toggle-desc">Serve structured JSON to AI agents instead of raw HTML. Reduces bandwidth costs by ~94%.</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="settings-som" checked onchange="saveSOMToggle()" />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">Plan &amp; Billing</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <!-- ── Overview ── -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="section-header">
         <div>
-          <div style="font-size:15px;font-weight:600;" id="billing-plan-name">Free Plan</div>
-          <div style="font-size:13px;color:var(--muted);margin-top:3px;" id="billing-plan-desc">Up to 100,000 agent requests/month</div>
+          <h2>Overview</h2>
+          <p>AI agent traffic on your domain — last 30 days</p>
         </div>
-        <button class="btn-sm btn-lime" onclick="showUpgradeModal()">Upgrade Plan</button>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);">
+          <span class="live-dot"></span> Live
+        </div>
       </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Requests</div>
+          <div class="stat-value violet" id="stat-requests">—</div>
+          <div class="stat-sub">agent requests this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bandwidth Saved</div>
+          <div class="stat-value teal" id="stat-bytes">—</div>
+          <div class="stat-sub">via SOM compression</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Cost Saved</div>
+          <div class="stat-value amber" id="stat-cost">—</div>
+          <div class="stat-sub">estimated CDN egress</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SOM Rate</div>
+          <div class="stat-value blue" id="stat-som">—</div>
+          <div class="stat-sub">requests served as SOM</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Daily Agent Traffic</div>
+        <div class="chart-wrap">
+          <canvas id="traffic-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Agents ── -->
+    <div class="tab-content" id="tab-agents">
+      <div class="section-header">
+        <div><h2>Agents</h2><p>Breakdown by AI system — last 30 days</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Agent breakdown</div>
+        <div id="agents-table-wrap">
+          <div class="empty-state"><div class="spinner"></div><p>Loading agents…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Content ── -->
+    <div class="tab-content" id="tab-content">
+      <div class="section-header">
+        <div><h2>Content</h2><p>Most crawled pages by AI agents</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top pages</div>
+        <div id="content-table-wrap">
+          <div class="empty-state"><div class="spinner"></div><p>Loading pages…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Setup ── -->
+    <div class="tab-content" id="tab-setup">
+      <div class="section-header">
+        <div><h2>Setup</h2><p>Connect Relay to your Cloudflare domain</p></div>
+      </div>
+      <div class="two-col" style="margin-top:0;">
+        <div class="card">
+          <div class="card-title">Your API Key</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+            This key authenticates the Cloudflare Worker to your Relay account. Keep it secret.
+          </p>
+          <div class="api-key-box">
+            <span class="api-key-val" id="api-key-display">Loading…</span>
+            <button class="btn" onclick="copyApiKey()" style="padding:5px 12px;font-size:12px;">Copy</button>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-danger" onclick="rotateKey()" style="font-size:13px;">Rotate key</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Quick Install</div>
+          <div class="setup-step">
+            <div class="step-num done">1</div>
+            <div class="step-body">
+              <div class="step-title">Create Relay account</div>
+              <div class="step-desc">Done — you're signed in.</div>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num" id="step2-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Run the setup CLI</div>
+              <div class="step-desc">In your terminal, run:</div>
+              <div class="code-block" style="padding-right:70px;">npx relay-init@latest<button class="copy-btn" onclick="copyText('npx relay-init@latest',this)">Copy</button></div>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Add route in Cloudflare</div>
+              <div class="step-desc">Go to Workers &amp; Pages → Routes → Add Route. Set pattern to <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface);padding:1px 5px;border-radius:3px;color:var(--violet);">yourdomain.com/*</code> and assign the relay-worker.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Settings ── -->
+    <div class="tab-content" id="tab-settings">
+      <div class="section-header">
+        <div><h2>Settings</h2><p>Publisher profile and licensing configuration</p></div>
+      </div>
+      <div class="two-col" style="margin-top:0;">
+        <div>
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-title">Publisher Profile</div>
+            <div class="form-group">
+              <label class="form-label">Display Name</label>
+              <input type="text" class="form-input" id="pub-name" placeholder="My Publication" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Domain</label>
+              <input type="text" class="form-input" id="pub-domain" placeholder="example.com" />
+            </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Billing</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <div style="font-weight:600;color:var(--text);">Current plan</div>
+                <div style="font-size:13px;color:var(--muted);margin-top:2px;" id="billing-plan">Free</div>
+              </div>
+              <span class="plan-badge" id="billing-badge">free</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="startCheckout('growth')">Upgrade to Growth — $299/mo</button>
+              <button class="btn" onclick="startCheckout('scale')">Scale — $999/mo</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">License &amp; Access Policy</div>
+          <div class="form-row">
+            <div class="form-row-label">
+              <h4>SOM Serving</h4>
+              <p>Serve structured content to AI agents instead of full HTML</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-som" onchange="saveSomToggle(this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:20px;">
+            <label class="form-label">License Policy</label>
+            <select class="form-input" id="license-policy" onchange="saveLicensePolicy(this.value)">
+              <option value="free">Free — No restrictions</option>
+              <option value="attribution-required">Attribution Required</option>
+              <option value="contact">Contact for License</option>
+              <option value="blocked">Blocked — Return 403</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">License URL <span style="color:var(--subtle);font-weight:400;">(optional)</span></label>
+            <input type="url" class="form-input" id="license-url" placeholder="https://example.com/licensing" />
+          </div>
+          <button class="btn btn-primary" onclick="savePolicySettings()">Save policy</button>
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+            <button class="btn btn-danger" onclick="handleSignOut()">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Onboarding modal ── -->
+  <div class="modal-overlay" id="onboarding-modal" style="display:none;">
+    <div class="modal-box">
+      <h2>Welcome to Relay</h2>
+      <p>Set up your publisher profile to get started. You'll need your domain to configure the Cloudflare Worker.</p>
+      <div class="form-group">
+        <label class="form-label">Display Name</label>
+        <input type="text" class="form-input" id="onboard-name" placeholder="My Publication" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Domain</label>
+        <input type="text" class="form-input" id="onboard-domain" placeholder="example.com" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="createPublisher()">Create publisher account</button>
     </div>
   </div>
 
-</main>
+  <div id="toast"></div>
 
-<script>
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  ? 'http://localhost:8000'
-  : 'https://relay-backend-7dip.onrender.com';
-let token    = localStorage.getItem('relay_token');
-let user     = JSON.parse(localStorage.getItem('relay_user') || 'null');
-let publisher = null;
-let apiKeyVisible = false;
+  <script>
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8000'
+      : 'https://relay-backend-7dip.onrender.com';
 
-// ── Auth guard ────────────────────────────────────────────────────────────────
-if (!token) {
-  window.location.href = '/new/';
-}
+    let token = localStorage.getItem('relay_token');
+    let publisher = null;
+    let chart = null;
 
-function authHeaders() {
-  return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-}
+    // ── Auth guard ──
+    if (!token) {
+      window.location.href = window.location.pathname.includes('/relay/') ? '/relay/new/' : '/new/';
+    }
 
-async function apiFetch(path, opts = {}) {
-  const res = await fetch(`${API_URL}${path}`, {
-    ...opts,
-    headers: { ...authHeaders(), ...(opts.headers || {}) },
-  });
-  if (res.status === 401) { logout(); return null; }
-  return res;
-}
+    function authHeaders() {
+      return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+    }
 
-function logout() {
-  localStorage.removeItem('relay_token');
-  localStorage.removeItem('relay_user');
-  window.location.href = '/new/';
-}
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = type;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-async function init() {
-  // Set avatar
-  if (user?.name) {
-    const img = document.getElementById('avatar-img');
-    img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=13131f&color=a3e635&size=56`;
-  }
+    function fmtBytes(b) {
+      if (b >= 1073741824) return (b/1073741824).toFixed(1) + ' GB';
+      if (b >= 1048576)    return (b/1048576).toFixed(1) + ' MB';
+      if (b >= 1024)       return (b/1024).toFixed(0) + ' KB';
+      return b + ' B';
+    }
 
-  // Load publisher
-  const res = await apiFetch('/publishers/me');
-  if (!res) return;
-  const data = await res.json();
-  publisher = data.publisher;
+    function fmtNum(n) {
+      if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+      if (n >= 1000)    return (n/1000).toFixed(1) + 'K';
+      return String(n);
+    }
 
-  if (!publisher) {
-    document.getElementById('onboarding-overlay').classList.add('show');
-    return;
-  }
+    // ── Tab switching ──
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'agents') loadAgents();
+        if (tab.dataset.tab === 'content') loadContent();
+      });
+    });
 
-  applyPublisherToUI();
-  loadOverview();
-}
+    // ── Init ──
+    async function init() {
+      try {
+        const res = await fetch(`${API_URL}/publishers/me`, { headers: authHeaders() });
+        if (res.status === 401) { localStorage.clear(); window.location.reload(); return; }
+        const data = await res.json();
 
-function applyPublisherToUI() {
-  if (!publisher) return;
+        if (!data.publisher) {
+          document.getElementById('onboarding-modal').style.display = 'flex';
+          return;
+        }
 
-  // Plan badge
-  const badge = document.getElementById('plan-badge');
-  badge.textContent = publisher.plan.charAt(0).toUpperCase() + publisher.plan.slice(1);
-  badge.className = `plan-badge ${publisher.plan !== 'free' ? publisher.plan : ''}`;
+        publisher = data.publisher;
+        applyPublisherUI();
+        loadOverview();
+      } catch(e) {
+        showToast('Connection error', 'error');
+      }
+    }
 
-  // Settings fields
-  document.getElementById('settings-name').value    = publisher.name    || '';
-  document.getElementById('settings-domain').value  = publisher.domain  || '';
-  document.getElementById('settings-policy').value  = publisher.license_policy || 'attribution-required';
-  document.getElementById('settings-license-url').value = publisher.license_url || '';
-  document.getElementById('settings-som').checked   = publisher.som_enabled !== false;
+    function applyPublisherUI() {
+      const plan = publisher.plan || 'free';
+      const badge = document.getElementById('plan-badge');
+      badge.textContent = plan;
+      badge.className = 'plan-badge ' + plan;
 
-  // Billing
-  const planNames = { free: 'Free Plan', growth: 'Growth Plan', scale: 'Scale Plan', enterprise: 'Enterprise' };
-  const planDescs = {
-    free:       'Up to 100,000 agent requests/month',
-    growth:     'Up to 5,000,000 agent requests/month',
-    scale:      'Up to 25,000,000 agent requests/month',
-    enterprise: 'Unlimited agent requests',
-  };
-  document.getElementById('billing-plan-name').textContent = planNames[publisher.plan] || publisher.plan;
-  document.getElementById('billing-plan-desc').textContent = planDescs[publisher.plan] || '';
+      const billingBadge = document.getElementById('billing-badge');
+      if (billingBadge) { billingBadge.textContent = plan; billingBadge.className = 'plan-badge ' + plan; }
+      const billingPlan = document.getElementById('billing-plan');
+      if (billingPlan) billingPlan.textContent = plan.charAt(0).toUpperCase() + plan.slice(1) + ' plan';
 
-  // Show upgrade banner on free
-  if (publisher.plan === 'free') {
-    document.getElementById('upgrade-banner').style.display = 'flex';
-  }
+      document.getElementById('api-key-display').textContent = publisher.api_key || '—';
+      document.getElementById('pub-name').value = publisher.name || '';
+      document.getElementById('pub-domain').value = publisher.domain || '';
+      document.getElementById('license-policy').value = publisher.license_policy || 'free';
+      document.getElementById('license-url').value = publisher.license_url || '';
+      document.getElementById('toggle-som').checked = publisher.som_enabled !== false;
 
-  // Subtitle
-  document.getElementById('overview-subtitle').textContent =
-    `AI agent traffic for ${publisher.domain} — last 30 days`;
-}
+      const user = JSON.parse(localStorage.getItem('relay_user') || '{}');
+      const av = document.getElementById('user-avatar');
+      if (user.picture) {
+        av.innerHTML = `<img src="${user.picture}" alt="avatar" />`;
+      } else if (user.name) {
+        av.textContent = user.name[0].toUpperCase();
+      }
+    }
 
-// ── Onboarding ────────────────────────────────────────────────────────────────
-async function submitOnboarding() {
-  const name   = document.getElementById('ob-name').value.trim();
-  const domain = document.getElementById('ob-domain').value.trim();
-  const errEl  = document.getElementById('ob-error');
-  const btn    = document.getElementById('ob-submit');
+    // ── Overview ──
+    async function loadOverview() {
+      try {
+        const res = await fetch(`${API_URL}/analytics/overview?days=30`, { headers: authHeaders() });
+        const d = await res.json();
+        document.getElementById('stat-requests').textContent = fmtNum(d.total_requests || 0);
+        document.getElementById('stat-bytes').textContent = fmtBytes(d.bytes_saved || 0);
+        document.getElementById('stat-cost').textContent = '$' + (d.cost_saved_usd || 0).toFixed(2);
+        document.getElementById('stat-som').textContent = Math.round((d.som_rate || 0) * 100) + '%';
+      } catch(e) {}
+      loadTimeseries();
+    }
 
-  if (!name || !domain) { errEl.textContent = 'Name and domain are required.'; errEl.style.display = 'block'; return; }
-  errEl.style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = 'Creating…';
+    async function loadTimeseries() {
+      try {
+        const res = await fetch(`${API_URL}/analytics/timeseries?days=30`, { headers: authHeaders() });
+        const rows = await res.json();
+        const labels = rows.map(r => {
+          const d = new Date(r.date);
+          return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        const values = rows.map(r => r.requests || 0);
+        const ctx = document.getElementById('traffic-chart').getContext('2d');
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Agent Requests',
+              data: values,
+              borderColor: '#7c3aed',
+              backgroundColor: 'rgba(124,58,237,.08)',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: '#7c3aed',
+              fill: true,
+              tension: 0.4,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(0,0,0,.06)' }, ticks: { color: '#6b6885', font: { family: 'JetBrains Mono', size: 11 } } },
+              y: { grid: { color: 'rgba(0,0,0,.06)' }, ticks: { color: '#6b6885', font: { family: 'JetBrains Mono', size: 11 } }, beginAtZero: true },
+            }
+          }
+        });
+      } catch(e) {}
+    }
 
-  const res = await apiFetch('/publishers', { method: 'POST', body: JSON.stringify({ name, domain }) });
-  if (!res) return;
-  const data = await res.json();
-  if (!res.ok) {
-    errEl.textContent = data.detail || 'Failed to create publisher account.';
-    errEl.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Create Publisher Account →';
-    return;
-  }
+    // ── Agents ──
+    async function loadAgents() {
+      const wrap = document.getElementById('agents-table-wrap');
+      wrap.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading agents…</p></div>';
+      try {
+        const res = await fetch(`${API_URL}/analytics/agents?days=30`, { headers: authHeaders() });
+        const rows = await res.json();
+        if (!rows.length) { wrap.innerHTML = '<div class="empty-state"><p>No agent traffic yet. Install the Worker to start tracking.</p></div>'; return; }
+        const tierClass = t => ({'training':'tier-training','inference':'tier-inference','search':'tier-search','unknown':'tier-unknown','blocked':'tier-blocked'}[t] || 'tier-unknown');
+        wrap.innerHTML = `<table class="data-table"><thead><tr>
+          <th>Agent</th><th>Tier</th><th>Requests</th><th>Bytes Saved</th><th>Last Seen</th>
+        </tr></thead><tbody>${rows.map(r => `<tr>
+          <td class="mono">${r.agent_name || 'Unknown'}</td>
+          <td><span class="tier-badge ${tierClass(r.tier)}">${r.tier || 'unknown'}</span></td>
+          <td class="mono">${fmtNum(r.requests || 0)}</td>
+          <td class="mono">${fmtBytes(r.bytes_saved || 0)}</td>
+          <td class="mono">${r.last_seen ? new Date(r.last_seen).toLocaleDateString() : '—'}</td>
+        </tr>`).join('')}</tbody></table>`;
+      } catch(e) { wrap.innerHTML = '<div class="empty-state"><p>Failed to load agents.</p></div>'; }
+    }
 
-  publisher = data.publisher;
-  document.getElementById('onboarding-overlay').classList.remove('show');
-  applyPublisherToUI();
-  loadOverview();
-}
+    // ── Content ──
+    async function loadContent() {
+      const wrap = document.getElementById('content-table-wrap');
+      wrap.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>Loading pages…</p></div>';
+      try {
+        const res = await fetch(`${API_URL}/analytics/content?days=30&limit=50`, { headers: authHeaders() });
+        const rows = await res.json();
+        if (!rows.length) { wrap.innerHTML = '<div class="empty-state"><p>No content data yet. Install the Worker to start tracking.</p></div>'; return; }
+        wrap.innerHTML = `<table class="data-table"><thead><tr>
+          <th>Page</th><th>Requests</th><th>Bytes Saved</th><th>Last Accessed</th>
+        </tr></thead><tbody>${rows.map(r => `<tr>
+          <td class="mono" style="max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.path}">${r.path || '/'}</td>
+          <td class="mono">${fmtNum(r.requests || 0)}</td>
+          <td class="mono">${fmtBytes(r.bytes_saved || 0)}</td>
+          <td class="mono">${r.last_seen ? new Date(r.last_seen).toLocaleDateString() : '—'}</td>
+        </tr>`).join('')}</tbody></table>`;
+      } catch(e) { wrap.innerHTML = '<div class="empty-state"><p>Failed to load content.</p></div>'; }
+    }
 
-// ── Analytics loaders ─────────────────────────────────────────────────────────
-let tsChart = null;
+    // ── Onboarding ──
+    async function createPublisher() {
+      const name = document.getElementById('onboard-name').value.trim();
+      const domain = document.getElementById('onboard-domain').value.trim();
+      if (!name || !domain) { showToast('Name and domain are required', 'error'); return; }
+      try {
+        const res = await fetch(`${API_URL}/publishers`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ name, domain }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to create publisher');
+        publisher = data.publisher;
+        document.getElementById('onboarding-modal').style.display = 'none';
+        applyPublisherUI();
+        loadOverview();
+        showToast('Publisher account created!');
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-async function loadOverview() {
-  const days = document.getElementById('days-select').value;
+    // ── Settings ──
+    async function saveProfile() {
+      const name = document.getElementById('pub-name').value.trim();
+      const domain = document.getElementById('pub-domain').value.trim();
+      try {
+        const res = await fetch(`${API_URL}/publishers/me`, {
+          method: 'PATCH', headers: authHeaders(),
+          body: JSON.stringify({ name, domain }),
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        publisher = (await res.json()).publisher;
+        showToast('Profile saved');
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-  // KPIs
-  const res = await apiFetch(`/analytics/overview?days=${days}`);
-  if (!res) return;
-  const d = await res.json();
+    async function savePolicySettings() {
+      const license_policy = document.getElementById('license-policy').value;
+      const license_url    = document.getElementById('license-url').value.trim();
+      try {
+        const res = await fetch(`${API_URL}/publishers/me`, {
+          method: 'PATCH', headers: authHeaders(),
+          body: JSON.stringify({ license_policy, license_url }),
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        publisher = (await res.json()).publisher;
+        showToast('Policy saved');
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-  document.getElementById('stat-requests').textContent    = fmtNum(d.total_requests);
-  document.getElementById('stat-requests-sub').textContent = `${fmtNum(d.som_requests)} via SOM`;
-  document.getElementById('stat-saved').textContent       = fmtBytes(d.bytes_saved);
-  document.getElementById('stat-saved-sub').textContent   = `from ${fmtBytes(d.bytes_served)} served`;
-  document.getElementById('stat-cost').textContent        = `$${d.cost_saved_usd.toFixed(2)}`;
-  document.getElementById('stat-som-rate').textContent    = `${(d.som_rate * 100).toFixed(1)}%`;
-  document.getElementById('stat-unique-pages').textContent = `${fmtNum(d.unique_pages)} unique pages crawled`;
+    async function saveSomToggle(enabled) {
+      try {
+        const res = await fetch(`${API_URL}/publishers/me`, {
+          method: 'PATCH', headers: authHeaders(),
+          body: JSON.stringify({ som_enabled: enabled }),
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        publisher = (await res.json()).publisher;
+        showToast('SOM ' + (enabled ? 'enabled' : 'disabled'));
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-  // Timeseries chart
-  const tsRes = await apiFetch(`/analytics/timeseries?days=${days}`);
-  if (!tsRes) return;
-  const ts = await tsRes.json();
+    async function saveLicensePolicy(val) {
+      try {
+        await fetch(`${API_URL}/publishers/me`, {
+          method: 'PATCH', headers: authHeaders(),
+          body: JSON.stringify({ license_policy: val }),
+        });
+      } catch(e) {}
+    }
 
-  const labels = ts.series.map(s => s.date);
-  const values = ts.series.map(s => s.requests);
+    async function rotateKey() {
+      if (!confirm('Rotate your API key? The Worker will stop working until you re-run npx relay-init.')) return;
+      try {
+        const res = await fetch(`${API_URL}/publishers/me/rotate-key`, { method: 'POST', headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed');
+        publisher.api_key = data.api_key;
+        document.getElementById('api-key-display').textContent = data.api_key;
+        showToast('API key rotated');
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-  if (tsChart) tsChart.destroy();
-  const ctx = document.getElementById('timeseries-chart').getContext('2d');
-  tsChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Agent Requests',
-        data: values,
-        backgroundColor: 'rgba(163,230,53,.25)',
-        borderColor: '#a3e635',
-        borderWidth: 1,
-        borderRadius: 3,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: {
-        backgroundColor: '#13131f',
-        borderColor: 'rgba(255,255,255,.07)',
-        borderWidth: 1,
-        titleColor: '#e8e8f0',
-        bodyColor: '#8888a0',
-      }},
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#8888a0', font: { family: 'JetBrains Mono', size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#8888a0', font: { family: 'JetBrains Mono', size: 11 } } },
-      },
-    },
-  });
-}
+    async function startCheckout(plan) {
+      try {
+        const res = await fetch(`${API_URL}/billing/checkout`, {
+          method: 'POST', headers: authHeaders(),
+          body: JSON.stringify({ plan }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed');
+        window.location.href = data.url;
+      } catch(e) { showToast(e.message, 'error'); }
+    }
 
-async function loadAgents() {
-  document.getElementById('agents-loading').style.display = 'block';
-  document.getElementById('agents-table').style.display   = 'none';
+    async function handleSignOut() {
+      try { await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: authHeaders() }); } catch(e) {}
+      localStorage.clear();
+      window.location.href = window.location.pathname.includes('/relay/') ? '/relay/new/' : '/new/';
+    }
 
-  const res = await apiFetch('/analytics/agents?days=30');
-  if (!res) return;
-  const d = await res.json();
+    function copyApiKey() {
+      const key = document.getElementById('api-key-display').textContent;
+      navigator.clipboard.writeText(key).then(() => showToast('API key copied'));
+    }
 
-  document.getElementById('agents-loading').style.display = 'none';
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      });
+    }
 
-  const tbody = document.getElementById('agents-tbody');
-  const total = d.agents.reduce((s, a) => s + a.requests, 0) || 1;
+    document.getElementById('user-avatar').addEventListener('click', () => {
+      if (confirm('Sign out?')) handleSignOut();
+    });
 
-  if (!d.agents.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px;">No agent traffic detected yet.</td></tr>`;
-  } else {
-    tbody.innerHTML = d.agents.map(a => `
-      <tr>
-        <td class="mono">${a.name}</td>
-        <td><span class="tier-badge tier-${a.tier}">${a.tier}</span></td>
-        <td class="mono">${fmtNum(a.requests)}</td>
-        <td class="mono">${fmtBytes(a.bytes_saved)}</td>
-        <td>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="flex:1;height:4px;background:var(--surface);border-radius:2px;">
-              <div style="height:4px;background:var(--lime);border-radius:2px;width:${Math.round(a.requests/total*100)}%"></div>
-            </div>
-            <span class="mono" style="color:var(--muted);min-width:32px;">${Math.round(a.requests/total*100)}%</span>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  document.getElementById('agents-table').style.display = 'table';
-}
-
-async function loadContent() {
-  document.getElementById('content-loading').style.display = 'block';
-  document.getElementById('content-table').style.display   = 'none';
-
-  const res = await apiFetch('/analytics/content?days=30&limit=25');
-  if (!res) return;
-  const d = await res.json();
-
-  document.getElementById('content-loading').style.display = 'none';
-
-  const tbody = document.getElementById('content-tbody');
-  if (!d.pages.length) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:32px;">No pages crawled yet.</td></tr>`;
-  } else {
-    tbody.innerHTML = d.pages.map(p => `
-      <tr>
-        <td class="mono" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${p.path}">${p.path}</td>
-        <td class="mono">${fmtNum(p.requests)}</td>
-        <td class="mono">${p.unique_agents}</td>
-        <td class="mono">${fmtBytes(p.bytes_saved)}</td>
-      </tr>
-    `).join('');
-  }
-
-  document.getElementById('content-table').style.display = 'table';
-}
-
-// ── Settings actions ──────────────────────────────────────────────────────────
-async function saveProfile() {
-  const name   = document.getElementById('settings-name').value.trim();
-  const domain = document.getElementById('settings-domain').value.trim();
-  const res = await apiFetch('/publishers/me', { method: 'PATCH', body: JSON.stringify({ name, domain }) });
-  if (res?.ok) { const d = await res.json(); publisher = d.publisher; alert('Profile saved.'); }
-}
-
-async function savePolicy() {
-  const license_policy = document.getElementById('settings-policy').value;
-  const license_url    = document.getElementById('settings-license-url').value.trim() || null;
-  const res = await apiFetch('/publishers/me', { method: 'PATCH', body: JSON.stringify({ license_policy, license_url }) });
-  if (res?.ok) { const d = await res.json(); publisher = d.publisher; alert('Policy saved.'); }
-}
-
-async function saveSOMToggle() {
-  const som_enabled = document.getElementById('settings-som').checked;
-  await apiFetch('/publishers/me', { method: 'PATCH', body: JSON.stringify({ som_enabled }) });
-}
-
-async function rotateKey() {
-  if (!confirm('This will invalidate your current Worker API key. Your Worker will stop working until you update the secret.\n\nContinue?')) return;
-  const res = await apiFetch('/publishers/me/rotate-key', { method: 'POST' });
-  if (res?.ok) {
-    const d = await res.json();
-    publisher.api_key = d.api_key;
-    document.getElementById('api-key-display').textContent = d.api_key;
-    alert('Key rotated. Update RELAY_API_KEY in your Worker: wrangler secret put RELAY_API_KEY');
-  }
-}
-
-function toggleApiKey() {
-  apiKeyVisible = !apiKeyVisible;
-  const el = document.getElementById('api-key-display');
-  const btn = document.getElementById('toggle-key-btn');
-  el.textContent = apiKeyVisible ? (publisher?.api_key || '—') : 'rly_••••••••••••••••';
-  btn.textContent = apiKeyVisible ? 'Hide' : 'Show';
-}
-
-function copyApiKey() {
-  if (publisher?.api_key) {
-    navigator.clipboard.writeText(publisher.api_key);
-    alert('API key copied to clipboard.');
-  }
-}
-
-function copyCode(el) {
-  navigator.clipboard.writeText(el.textContent.replace('COPY', '').trim());
-  el.style.borderColor = 'var(--lime-border)';
-  setTimeout(() => el.style.borderColor = 'var(--border)', 1000);
-}
-
-function showUpgradeModal() {
-  alert('Upgrade flow — connect Stripe checkout here.\n\nCall POST /billing/checkout with plan: "growth" or "scale".');
-}
-
-// ── Tab switching ─────────────────────────────────────────────────────────────
-document.querySelectorAll('.nav-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(`tab-${tab}`).classList.add('active');
-
-    if (tab === 'agents')  loadAgents();
-    if (tab === 'content') loadContent();
-  });
-});
-
-// ── Formatters ────────────────────────────────────────────────────────────────
-function fmtNum(n) {
-  if (n === undefined || n === null) return '—';
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
-  if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
-  return n.toString();
-}
-
-function fmtBytes(b) {
-  if (!b) return '0 B';
-  if (b >= 1_073_741_824) return (b / 1_073_741_824).toFixed(2) + ' GB';
-  if (b >= 1_048_576)     return (b / 1_048_576).toFixed(1)     + ' MB';
-  if (b >= 1_024)         return (b / 1_024).toFixed(1)         + ' KB';
-  return b + ' B';
-}
-
-// ── Boot ──────────────────────────────────────────────────────────────────────
-init();
-</script>
+    init();
+  </script>
 </body>
 </html>
