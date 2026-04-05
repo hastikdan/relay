@@ -651,10 +651,8 @@
       <div class="card">
         <div class="card-title">Quick Install</div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Run these commands in your terminal (requires Node.js 18+):</p>
-        <div class="code-block" onclick="copyCode(this)">npm install -g wrangler
-wrangler login
-npx relay-init</div>
-        <p style="font-size:12px;color:var(--muted);margin-top:8px;">Or <a href="https://developers.cloudflare.com/workers/get-started/guide/" target="_blank" style="color:var(--blue)">follow the manual setup guide →</a></p>
+        <div class="code-block" onclick="copyCode(this)">npx relay-init@latest</div>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px;">Requires Node.js 18+ and a Cloudflare account. Or <a href="https://github.com/hastikdan/relay-worker" target="_blank" style="color:var(--blue)">view manual setup →</a></p>
       </div>
     </div>
 
@@ -672,8 +670,9 @@ npx relay-init</div>
         <div class="step-body">
           <div class="step-title">Install the Cloudflare Worker</div>
           <div class="step-desc">Clone the worker, add your API key as a secret, and deploy to your Cloudflare account.</div>
-          <div class="code-block" onclick="copyCode(this)">git clone https://github.com/relay-dev/relay-worker
+          <div class="code-block" onclick="copyCode(this)">git clone https://github.com/hastikdan/relay-worker
 cd relay-worker
+npm install
 wrangler secret put RELAY_API_KEY
 wrangler deploy</div>
         </div>
@@ -768,7 +767,9 @@ Worker: relay-worker</div>
 </main>
 
 <script>
-const API_URL = 'https://relay-backend.onrender.com';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : 'https://relay-backend.onrender.com';
 let token    = localStorage.getItem('relay_token');
 let user     = JSON.parse(localStorage.getItem('relay_user') || 'null');
 let publisher = null;

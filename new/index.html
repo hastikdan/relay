@@ -167,7 +167,9 @@
   </div>
 
   <script>
-    const API_URL = 'https://relay-backend.onrender.com';
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:8000'
+      : 'https://relay-backend.onrender.com';
 
     function showStatus(msg, type = 'error') {
       const el = document.getElementById('status');
@@ -188,7 +190,7 @@
 
         localStorage.setItem('relay_token', data.token);
         localStorage.setItem('relay_user',  JSON.stringify(data.user));
-        window.location.href = '/app/';
+        window.location.href = window.location.pathname.includes('/relay/') ? '/relay/app/' : '/app/';
       } catch (err) {
         showStatus(err.message || 'Sign-in failed — please try again.');
       }
@@ -196,12 +198,12 @@
 
     // Redirect if already logged in
     if (localStorage.getItem('relay_token')) {
-      window.location.href = '/app/';
+      window.location.href = window.location.pathname.includes('/relay/') ? '/relay/app/' : '/app/';
     }
 
     window.onload = () => {
       google.accounts.id.initialize({
-        client_id: 'REPLACE_WITH_GOOGLE_CLIENT_ID',
+        client_id: window.__RELAY_GOOGLE_CLIENT_ID__ || 'REPLACE_WITH_GOOGLE_CLIENT_ID',
         callback: handleCredentialResponse,
         auto_select: false,
       });
