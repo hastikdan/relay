@@ -442,17 +442,29 @@
         <div><h2>Setup</h2><p>Connect Relay to your Cloudflare domain</p></div>
       </div>
       <div class="two-col" style="margin-top:0;">
-        <div class="card">
-          <div class="card-title">Your API Key</div>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
-            This key authenticates the Cloudflare Worker to your Relay account. Keep it secret.
-          </p>
-          <div class="api-key-box">
-            <span class="api-key-val" id="api-key-display">Loading…</span>
-            <button class="btn" onclick="copyApiKey()" style="padding:5px 12px;font-size:12px;">Copy</button>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card">
+            <div class="card-title">Your API Key</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+              This key authenticates the Cloudflare Worker to your Relay account. Keep it secret.
+            </p>
+            <div class="api-key-box">
+              <span class="api-key-val" id="api-key-display">Loading…</span>
+              <button class="btn" onclick="copyApiKey()" style="padding:5px 12px;font-size:12px;">Copy</button>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-danger" onclick="rotateKey()" style="font-size:13px;">Rotate key</button>
+            </div>
           </div>
-          <div style="margin-top:12px;">
-            <button class="btn btn-danger" onclick="rotateKey()" style="font-size:13px;">Rotate key</button>
+          <div class="card">
+            <div class="card-title">robots.txt Directives</div>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+              Add these lines to your <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface);padding:1px 5px;border-radius:3px;color:var(--violet);">robots.txt</code> to enable standards-compliant SOM discovery. Future AI frameworks that check robots.txt will find your SOM endpoint automatically — without needing agent detection.
+            </p>
+            <div class="code-block" style="padding-right:70px;white-space:pre;font-size:11px;" id="robots-directives">Loading…<button class="copy-btn" onclick="copyRobotsDirectives(this)" style="top:8px;right:8px;">Copy</button></div>
+            <p style="font-size:12px;color:var(--subtle);margin-top:10px;line-height:1.6;">
+              Your Worker already adds a <code style="font-family:'JetBrains Mono',monospace;font-size:11px;">Link: rel="semantic-representation"</code> header to every HTML response for passive discovery. robots.txt is an additional signal.
+            </p>
           </div>
         </div>
         <div class="card">
@@ -477,6 +489,13 @@
             <div class="step-body">
               <div class="step-title">Add route in Cloudflare</div>
               <div class="step-desc">Go to Workers &amp; Pages → Routes → Add Route. Set pattern to <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--surface);padding:1px 5px;border-radius:3px;color:var(--violet);">yourdomain.com/*</code> and assign the relay-worker.</div>
+            </div>
+          </div>
+          <div class="setup-step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Add robots.txt directives</div>
+              <div class="step-desc">Paste the SOM directives block (from the card on the left) into your robots.txt. This enables discovery by any AI framework that checks robots.txt before crawling.</div>
             </div>
           </div>
         </div>
@@ -637,6 +656,7 @@
         publisher = data.publisher;
         applyPublisherUI();
         loadOverview();
+        loadRobotsDirectives();
       } catch(e) {
         showToast('Connection error', 'error');
       }
@@ -860,6 +880,27 @@
       try { await fetch(`${API_URL}/auth/logout`, { method: 'POST', headers: authHeaders() }); } catch(e) {}
       localStorage.clear();
       window.location.href = window.location.pathname.includes('/relay/') ? '/relay/new/' : '/new/';
+    }
+
+    async function loadRobotsDirectives() {
+      try {
+        const res = await fetch(`${API_URL}/publishers/me/robots-txt-directives`, { headers: authHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        const el = document.getElementById('robots-directives');
+        const btn = el.querySelector('.copy-btn');
+        el.childNodes[0].textContent = data.directives + '\n';
+        btn.onclick = () => copyRobotsDirectives(btn, data.directives);
+      } catch(e) {}
+    }
+
+    function copyRobotsDirectives(btn, text) {
+      const src = text || document.getElementById('robots-directives').childNodes[0].textContent;
+      navigator.clipboard.writeText(src.trim()).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      });
     }
 
     function copyApiKey() {
